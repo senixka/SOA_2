@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package mafia_game;
+
+service MafiaGame {
+    rpc OnClientConnect(PlayerName) returns (PlayerId) {}
+    rpc OnClientAction(ActionRequest) returns (ActionResponse) {}
+    rpc OnClientHeartbeat(PlayerId) returns (Actions) {}
+    rpc GetAllPlayers(Empty) returns (PlayerList) {}
+    rpc GetValidActions(PlayerId) returns (Actions) {}
+    rpc GetSessionInfo(PlayerId) returns (SessionInfo) {}
+}
+
+message Empty {
+}
+
+message PlayerId {
+    int32 player_id = 1;
+}
+
+message PlayerName {
+    string player_name = 1;
+}
+
+message SessionPlayer {
+    int32 player_id = 1;
+    string player_name = 2;
+    string player_role = 3;
+}
+
+message SessionInfo {
+    int32 session_id = 1;
+    bool is_day = 2;
+    repeated SessionPlayer players = 3;
+}
+
+message Player {
+    int32 player_id = 1;
+    int32 session_id = 2;
+    string player_name = 3;
+}
+
+message PlayerList {
+    repeated Player all_players = 1;
+}
+
+message ActionRequest {
+    int32 player_id = 1;
+    string action = 2;
+}
+
+message ActionResponse {
+    bool is_success = 1;
+}
+
+message Actions {
+    repeated string actions = 1;
+}

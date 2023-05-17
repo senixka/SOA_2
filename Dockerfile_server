@@ -1,0 +1,13 @@
+FROM python:3.9
+
+RUN pip install grpcio==1.54.0
+RUN pip install grpcio-tools==1.54.0
+
+ARG ADDR=0.0.0.0:50051
+ENV SERVER_ADDR=$ADDR
+
+COPY . /app/
+
+WORKDIR /app/
+
+CMD ["python3", "/app/server.py"]
