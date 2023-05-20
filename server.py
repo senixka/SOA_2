@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 import time
 import os
@@ -370,6 +371,32 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
 
     ################################## gRPC Functions ##################################
 
+    def GetNonSessionPids(self, request, context):
+        with self.lock:
+            pids = [pid for pid, info in self.all_players.items() if info.session_id == -1]
+
+        return grpc_tools_pb2.PidList(pids=pids)
+
+    def GetLightSessionInfo(self, request, context):
+        client_pid = request.player_id
+
+        with self.lock:
+            if not self.IsPidValid(client_pid):
+                return grpc_tools_pb2.LightSessionInfo(session_id=-1, player_role='', is_pid_valid=False, is_day=True,
+                                                       mafia_pids=[], other_pids=[])
+
+            sid = self.all_players[client_pid].session_id
+
+            is_day, mafia_pids, other_pids, player_role = True, [], [], ''
+            if sid != -1:
+                is_day = self.IsDayTime(sid)
+                mafia_pids = self.GetPidsByRole(sid, 'mafia')
+                other_pids = self.GetPidsByRole(sid, 'ghost') + self.GetPidsByRole(sid, 'cop') + self.GetPidsByRole(sid, 'civil')
+                player_role = self.GetRoleByPid(sid, client_pid)
+
+        return grpc_tools_pb2.LightSessionInfo(session_id=sid, player_role=player_role, is_pid_valid=True, is_day=is_day,
+                                               mafia_pids=mafia_pids, other_pids=other_pids)
+
     def GetSessionInfo(self, request, context):
         client_pid = request.player_id
 
@@ -448,13 +475,14 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
 
         with self.lock:
             if not self.IsPidValid(pid):
-                return grpc_tools_pb2.Actions(actions=[])
+                return grpc_tools_pb2.Actions(session_id=-1, actions=[])
 
             self.last_hb_time[pid] = datetime.now()
             actions = self.notify[pid].copy()
             self.notify[pid].clear()
+            sid = self.all_players[pid].session_id
 
-        return grpc_tools_pb2.Actions(actions=actions)
+        return grpc_tools_pb2.Actions(session_id=sid, actions=actions)
 
     ####################################################################################
 
@@ -472,4 +500,11 @@ def serve():
 
 
 if __name__ == "__main__":
-    serve()
+    try:
+        serve()
+    except:
+        print('Interrupted')
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

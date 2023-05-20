@@ -1,9 +1,12 @@
 FROM python:3.9
 
+RUN apt-get update && apt-get install -y rabbitmq-server
+
 RUN pip install grpcio==1.54.0
 RUN pip install grpcio-tools==1.54.0
 RUN pip install pika==1.3.2
 RUN pip install pika-stubs==0.1.3
+
 
 ARG ADDR=0.0.0.0:50051
 ENV SERVER_ADDR=$ADDR
@@ -12,4 +15,4 @@ COPY . /app/
 
 WORKDIR /app/
 
-CMD ["python3", "/app/client.py"]
+CMD ["python3", "/app/chat_server.py"]

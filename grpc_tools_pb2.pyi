@@ -20,14 +20,38 @@ class ActionResponse(_message.Message):
     def __init__(self, is_success: bool = ...) -> None: ...
 
 class Actions(_message.Message):
-    __slots__ = ["actions"]
+    __slots__ = ["actions", "session_id"]
     ACTIONS_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
     actions: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, actions: _Optional[_Iterable[str]] = ...) -> None: ...
+    session_id: int
+    def __init__(self, session_id: _Optional[int] = ..., actions: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class Empty(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class LightSessionInfo(_message.Message):
+    __slots__ = ["is_day", "is_pid_valid", "mafia_pids", "other_pids", "player_role", "session_id"]
+    IS_DAY_FIELD_NUMBER: _ClassVar[int]
+    IS_PID_VALID_FIELD_NUMBER: _ClassVar[int]
+    MAFIA_PIDS_FIELD_NUMBER: _ClassVar[int]
+    OTHER_PIDS_FIELD_NUMBER: _ClassVar[int]
+    PLAYER_ROLE_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    is_day: bool
+    is_pid_valid: bool
+    mafia_pids: _containers.RepeatedScalarFieldContainer[int]
+    other_pids: _containers.RepeatedScalarFieldContainer[int]
+    player_role: str
+    session_id: int
+    def __init__(self, session_id: _Optional[int] = ..., player_role: _Optional[str] = ..., is_pid_valid: bool = ..., is_day: bool = ..., mafia_pids: _Optional[_Iterable[int]] = ..., other_pids: _Optional[_Iterable[int]] = ...) -> None: ...
+
+class PidList(_message.Message):
+    __slots__ = ["pids"]
+    PIDS_FIELD_NUMBER: _ClassVar[int]
+    pids: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(self, pids: _Optional[_Iterable[int]] = ...) -> None: ...
 
 class Player(_message.Message):
     __slots__ = ["player_id", "player_name", "session_id"]

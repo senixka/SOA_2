@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10grpc_tools.proto\x12\nmafia_game\"\x07\n\x05\x45mpty\"\x1d\n\x08PlayerId\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\"!\n\nPlayerName\x12\x13\n\x0bplayer_name\x18\x01 \x01(\t\"L\n\rSessionPlayer\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\x12\x13\n\x0bplayer_name\x18\x02 \x01(\t\x12\x13\n\x0bplayer_role\x18\x03 \x01(\t\"]\n\x0bSessionInfo\x12\x12\n\nsession_id\x18\x01 \x01(\x05\x12\x0e\n\x06is_day\x18\x02 \x01(\x08\x12*\n\x07players\x18\x03 \x03(\x0b\x32\x19.mafia_game.SessionPlayer\"D\n\x06Player\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\x12\x12\n\nsession_id\x18\x02 \x01(\x05\x12\x13\n\x0bplayer_name\x18\x03 \x01(\t\"5\n\nPlayerList\x12\'\n\x0b\x61ll_players\x18\x01 \x03(\x0b\x32\x12.mafia_game.Player\"2\n\rActionRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\t\"$\n\x0e\x41\x63tionResponse\x12\x12\n\nis_success\x18\x01 \x01(\x08\"\x1a\n\x07\x41\x63tions\x12\x0f\n\x07\x61\x63tions\x18\x01 \x03(\t2\x9c\x03\n\tMafiaGame\x12\x41\n\x0fOnClientConnect\x12\x16.mafia_game.PlayerName\x1a\x14.mafia_game.PlayerId\"\x00\x12I\n\x0eOnClientAction\x12\x19.mafia_game.ActionRequest\x1a\x1a.mafia_game.ActionResponse\"\x00\x12@\n\x11OnClientHeartbeat\x12\x14.mafia_game.PlayerId\x1a\x13.mafia_game.Actions\"\x00\x12<\n\rGetAllPlayers\x12\x11.mafia_game.Empty\x1a\x16.mafia_game.PlayerList\"\x00\x12>\n\x0fGetValidActions\x12\x14.mafia_game.PlayerId\x1a\x13.mafia_game.Actions\"\x00\x12\x41\n\x0eGetSessionInfo\x12\x14.mafia_game.PlayerId\x1a\x17.mafia_game.SessionInfo\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10grpc_tools.proto\x12\nmafia_game\"\x07\n\x05\x45mpty\"\x1d\n\x08PlayerId\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\"\x17\n\x07PidList\x12\x0c\n\x04pids\x18\x01 \x03(\x05\"!\n\nPlayerName\x12\x13\n\x0bplayer_name\x18\x01 \x01(\t\"L\n\rSessionPlayer\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\x12\x13\n\x0bplayer_name\x18\x02 \x01(\t\x12\x13\n\x0bplayer_role\x18\x03 \x01(\t\"]\n\x0bSessionInfo\x12\x12\n\nsession_id\x18\x01 \x01(\x05\x12\x0e\n\x06is_day\x18\x02 \x01(\x08\x12*\n\x07players\x18\x03 \x03(\x0b\x32\x19.mafia_game.SessionPlayer\"\x89\x01\n\x10LightSessionInfo\x12\x12\n\nsession_id\x18\x01 \x01(\x05\x12\x13\n\x0bplayer_role\x18\x02 \x01(\t\x12\x14\n\x0cis_pid_valid\x18\x03 \x01(\x08\x12\x0e\n\x06is_day\x18\x04 \x01(\x08\x12\x12\n\nmafia_pids\x18\x05 \x03(\x05\x12\x12\n\nother_pids\x18\x06 \x03(\x05\"D\n\x06Player\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\x12\x12\n\nsession_id\x18\x02 \x01(\x05\x12\x13\n\x0bplayer_name\x18\x03 \x01(\t\"5\n\nPlayerList\x12\'\n\x0b\x61ll_players\x18\x01 \x03(\x0b\x32\x12.mafia_game.Player\"2\n\rActionRequest\x12\x11\n\tplayer_id\x18\x01 \x01(\x05\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\t\"$\n\x0e\x41\x63tionResponse\x12\x12\n\nis_success\x18\x01 \x01(\x08\".\n\x07\x41\x63tions\x12\x12\n\nsession_id\x18\x01 \x01(\x05\x12\x0f\n\x07\x61\x63tions\x18\x02 \x03(\t2\xa8\x04\n\tMafiaGame\x12\x41\n\x0fOnClientConnect\x12\x16.mafia_game.PlayerName\x1a\x14.mafia_game.PlayerId\"\x00\x12I\n\x0eOnClientAction\x12\x19.mafia_game.ActionRequest\x1a\x1a.mafia_game.ActionResponse\"\x00\x12@\n\x11OnClientHeartbeat\x12\x14.mafia_game.PlayerId\x1a\x13.mafia_game.Actions\"\x00\x12<\n\rGetAllPlayers\x12\x11.mafia_game.Empty\x1a\x16.mafia_game.PlayerList\"\x00\x12>\n\x0fGetValidActions\x12\x14.mafia_game.PlayerId\x1a\x13.mafia_game.Actions\"\x00\x12\x41\n\x0eGetSessionInfo\x12\x14.mafia_game.PlayerId\x1a\x17.mafia_game.SessionInfo\"\x00\x12K\n\x13GetLightSessionInfo\x12\x14.mafia_game.PlayerId\x1a\x1c.mafia_game.LightSessionInfo\"\x00\x12=\n\x11GetNonSessionPids\x12\x11.mafia_game.Empty\x1a\x13.mafia_game.PidList\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'grpc_tools_pb2', globals())
@@ -24,22 +24,26 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _EMPTY._serialized_end=39
   _PLAYERID._serialized_start=41
   _PLAYERID._serialized_end=70
-  _PLAYERNAME._serialized_start=72
-  _PLAYERNAME._serialized_end=105
-  _SESSIONPLAYER._serialized_start=107
-  _SESSIONPLAYER._serialized_end=183
-  _SESSIONINFO._serialized_start=185
-  _SESSIONINFO._serialized_end=278
-  _PLAYER._serialized_start=280
-  _PLAYER._serialized_end=348
-  _PLAYERLIST._serialized_start=350
-  _PLAYERLIST._serialized_end=403
-  _ACTIONREQUEST._serialized_start=405
-  _ACTIONREQUEST._serialized_end=455
-  _ACTIONRESPONSE._serialized_start=457
-  _ACTIONRESPONSE._serialized_end=493
-  _ACTIONS._serialized_start=495
-  _ACTIONS._serialized_end=521
-  _MAFIAGAME._serialized_start=524
-  _MAFIAGAME._serialized_end=936
+  _PIDLIST._serialized_start=72
+  _PIDLIST._serialized_end=95
+  _PLAYERNAME._serialized_start=97
+  _PLAYERNAME._serialized_end=130
+  _SESSIONPLAYER._serialized_start=132
+  _SESSIONPLAYER._serialized_end=208
+  _SESSIONINFO._serialized_start=210
+  _SESSIONINFO._serialized_end=303
+  _LIGHTSESSIONINFO._serialized_start=306
+  _LIGHTSESSIONINFO._serialized_end=443
+  _PLAYER._serialized_start=445
+  _PLAYER._serialized_end=513
+  _PLAYERLIST._serialized_start=515
+  _PLAYERLIST._serialized_end=568
+  _ACTIONREQUEST._serialized_start=570
+  _ACTIONREQUEST._serialized_end=620
+  _ACTIONRESPONSE._serialized_start=622
+  _ACTIONRESPONSE._serialized_end=658
+  _ACTIONS._serialized_start=660
+  _ACTIONS._serialized_end=706
+  _MAFIAGAME._serialized_start=709
+  _MAFIAGAME._serialized_end=1261
 # @@protoc_insertion_point(module_scope)

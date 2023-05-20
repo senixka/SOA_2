@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  game_server:
+    build:
+      dockerfile: ./Dockerfile_server
+      context: .
+      args:
+        ADDR: ${SERVER_ADDR}
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+
+  chat_server:
+    build:
+      dockerfile: ./Dockerfile_chat_server
+      context: .
+      args:
+        ADDR: ${SERVER_ADDR}
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - game_server
+
+  client:
+    build:
+      dockerfile: ./Dockerfile_client
+      context: .
+      args:
+        ADDR: ${SERVER_ADDR}
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - game_server
+      - chat_server

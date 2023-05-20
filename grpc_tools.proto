@@ -9,6 +9,8 @@ service MafiaGame {
     rpc GetAllPlayers(Empty) returns (PlayerList) {}
     rpc GetValidActions(PlayerId) returns (Actions) {}
     rpc GetSessionInfo(PlayerId) returns (SessionInfo) {}
+    rpc GetLightSessionInfo(PlayerId) returns (LightSessionInfo) {}
+    rpc GetNonSessionPids(Empty) returns (PidList) {}
 }
 
 message Empty {
@@ -16,6 +18,10 @@ message Empty {
 
 message PlayerId {
     int32 player_id = 1;
+}
+
+message PidList {
+    repeated int32 pids = 1;
 }
 
 message PlayerName {
@@ -32,6 +38,15 @@ message SessionInfo {
     int32 session_id = 1;
     bool is_day = 2;
     repeated SessionPlayer players = 3;
+}
+
+message LightSessionInfo {
+    int32 session_id = 1;
+    string player_role = 2;
+    bool is_pid_valid = 3;
+    bool is_day = 4;
+    repeated int32 mafia_pids = 5;
+    repeated int32 other_pids = 6;
 }
 
 message Player {
@@ -54,5 +69,6 @@ message ActionResponse {
 }
 
 message Actions {
-    repeated string actions = 1;
+    int32 session_id = 1;
+    repeated string actions = 2;
 }

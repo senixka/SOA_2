@@ -44,6 +44,16 @@ class MafiaGameStub(object):
                 request_serializer=grpc__tools__pb2.PlayerId.SerializeToString,
                 response_deserializer=grpc__tools__pb2.SessionInfo.FromString,
                 )
+        self.GetLightSessionInfo = channel.unary_unary(
+                '/mafia_game.MafiaGame/GetLightSessionInfo',
+                request_serializer=grpc__tools__pb2.PlayerId.SerializeToString,
+                response_deserializer=grpc__tools__pb2.LightSessionInfo.FromString,
+                )
+        self.GetNonSessionPids = channel.unary_unary(
+                '/mafia_game.MafiaGame/GetNonSessionPids',
+                request_serializer=grpc__tools__pb2.Empty.SerializeToString,
+                response_deserializer=grpc__tools__pb2.PidList.FromString,
+                )
 
 
 class MafiaGameServicer(object):
@@ -85,6 +95,18 @@ class MafiaGameServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetLightSessionInfo(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNonSessionPids(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MafiaGameServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -117,6 +139,16 @@ def add_MafiaGameServicer_to_server(servicer, server):
                     servicer.GetSessionInfo,
                     request_deserializer=grpc__tools__pb2.PlayerId.FromString,
                     response_serializer=grpc__tools__pb2.SessionInfo.SerializeToString,
+            ),
+            'GetLightSessionInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetLightSessionInfo,
+                    request_deserializer=grpc__tools__pb2.PlayerId.FromString,
+                    response_serializer=grpc__tools__pb2.LightSessionInfo.SerializeToString,
+            ),
+            'GetNonSessionPids': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNonSessionPids,
+                    request_deserializer=grpc__tools__pb2.Empty.FromString,
+                    response_serializer=grpc__tools__pb2.PidList.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -227,5 +259,39 @@ class MafiaGame(object):
         return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetSessionInfo',
             grpc__tools__pb2.PlayerId.SerializeToString,
             grpc__tools__pb2.SessionInfo.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetLightSessionInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetLightSessionInfo',
+            grpc__tools__pb2.PlayerId.SerializeToString,
+            grpc__tools__pb2.LightSessionInfo.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetNonSessionPids(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetNonSessionPids',
+            grpc__tools__pb2.Empty.SerializeToString,
+            grpc__tools__pb2.PidList.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
