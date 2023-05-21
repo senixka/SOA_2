@@ -1,6 +1,14 @@
 version: '3'
 
 services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    network_mode: "host"
+
   game_server:
     build:
       dockerfile: ./Dockerfile_server
