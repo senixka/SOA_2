@@ -7,6 +7,7 @@ service MafiaGame {
     rpc OnClientAction(ActionRequest) returns (ActionResponse) {}
     rpc OnClientHeartbeat(PlayerId) returns (Actions) {}
     rpc GetAllPlayers(Empty) returns (PlayerList) {}
+    rpc GetPlayerStats(PlayerId) returns (PlayerStats) {}
     rpc GetValidActions(PlayerId) returns (Actions) {}
     rpc GetSessionInfo(PlayerId) returns (SessionInfo) {}
     rpc GetLightSessionInfo(PlayerId) returns (LightSessionInfo) {}
@@ -26,6 +27,14 @@ message PidList {
 
 message PlayerName {
     string player_name = 1;
+}
+
+message PlayerStats {
+    int32 session_count = 1;
+    int32 win_count = 2;
+    int32 lose_count = 3;
+    int32 time_in_game = 4;
+    bool is_pid_valid = 5;
 }
 
 message SessionPlayer {

@@ -28,8 +28,16 @@ services:
     network_mode: "host"
     stdin_open: true
     tty: true
-    depends_on:
-      - game_server
+
+  rest_server:
+    build:
+      dockerfile: ./Dockerfile_rest_server
+      context: .
+      args:
+        ADDR: ${SERVER_ADDR}
+    network_mode: "host"
+    stdin_open: true
+    tty: true
 
   client:
     build:
@@ -40,6 +48,3 @@ services:
     network_mode: "host"
     stdin_open: true
     tty: true
-    depends_on:
-      - game_server
-      - chat_server

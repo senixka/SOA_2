@@ -34,6 +34,11 @@ class MafiaGameStub(object):
                 request_serializer=grpc__tools__pb2.Empty.SerializeToString,
                 response_deserializer=grpc__tools__pb2.PlayerList.FromString,
                 )
+        self.GetPlayerStats = channel.unary_unary(
+                '/mafia_game.MafiaGame/GetPlayerStats',
+                request_serializer=grpc__tools__pb2.PlayerId.SerializeToString,
+                response_deserializer=grpc__tools__pb2.PlayerStats.FromString,
+                )
         self.GetValidActions = channel.unary_unary(
                 '/mafia_game.MafiaGame/GetValidActions',
                 request_serializer=grpc__tools__pb2.PlayerId.SerializeToString,
@@ -78,6 +83,12 @@ class MafiaGameServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetAllPlayers(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetPlayerStats(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -129,6 +140,11 @@ def add_MafiaGameServicer_to_server(servicer, server):
                     servicer.GetAllPlayers,
                     request_deserializer=grpc__tools__pb2.Empty.FromString,
                     response_serializer=grpc__tools__pb2.PlayerList.SerializeToString,
+            ),
+            'GetPlayerStats': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPlayerStats,
+                    request_deserializer=grpc__tools__pb2.PlayerId.FromString,
+                    response_serializer=grpc__tools__pb2.PlayerStats.SerializeToString,
             ),
             'GetValidActions': grpc.unary_unary_rpc_method_handler(
                     servicer.GetValidActions,
@@ -225,6 +241,23 @@ class MafiaGame(object):
         return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetAllPlayers',
             grpc__tools__pb2.Empty.SerializeToString,
             grpc__tools__pb2.PlayerList.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetPlayerStats(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetPlayerStats',
+            grpc__tools__pb2.PlayerId.SerializeToString,
+            grpc__tools__pb2.PlayerStats.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

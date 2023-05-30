@@ -1,0 +1,18 @@
+FROM python:3.9
+
+RUN pip install grpcio==1.54.0
+RUN pip install grpcio-tools==1.54.0
+RUN pip install reportlab==3.6.8
+RUN pip install Flask==2.2.3
+RUN pip install Flask-RESTful==0.3.10
+RUN pip install PyJWT==2.3.0
+
+
+ARG ADDR=0.0.0.0:50051
+ENV SERVER_ADDR=$ADDR
+
+COPY . /app/
+
+WORKDIR /app/
+
+CMD ["python3", "/app/rest_server.py"]

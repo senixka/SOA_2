@@ -1,23 +1,41 @@
-import sys
-from datetime import datetime
-import time
 import os
-import random
-from threading import Lock, Thread
+import sys
+import time
 import grpc
+import random
 import grpc_tools_pb2
 import grpc_tools_pb2_grpc
+from datetime import datetime
 from concurrent import futures
+from threading import Lock, Thread
 
 
 class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
     def __init__(self) -> None:
         print('In server constructor')
-        self.last_hb_time = {}  # pid -> datetime
-        self.notify = {}  # pid -> message queue
         self.id_counter = 0  # to create unique id
-        self.all_players = {}  # pid -> pb_Player
+        self.last_hb_time = {}  # pid -> datetime
+        self.notify = {}        # pid -> message queue
+        self.all_players = {}   # pid -> pb_Player
+
         self.session_info = {}  # sid -> info
+        # Session state example
+        # self.session_info[sid] = {
+        #         'is_day': True,
+        #         'night_check': [],
+        #         'votes': {},
+        #         'role' : {mafia_id: 'mafia', cop_id: 'cop', civil_1: 'civil', civil_2: 'civil'},
+        #         'actions': {mafia_id: ['end_day'], cop_id: ['end_day'], civil_1: ['end_day'], civil_2: ['end_day']}
+        #     }
+
+        self.pid_stats = {}     # pid -> player stats
+        # Player state example:
+        # self.pid_stats[pid] = {
+        #     'session_count': 0,
+        #     'win_count': 0,
+        #     'arrival_time': 0
+        # }
+
         self.lock = Lock()  # lock game logic
 
         self.is_server_alive = True
@@ -52,20 +70,7 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
             if pid not in skip_pid:
                 self.notify[pid].append(value)
 
-    # def NotifyAll(self, value: str) -> None:
-    #     for pid in self.all_players.keys():
-    #         self.notify[pid].append(value)
-
     ########################## Session Helpers ############################
-
-    # Session state example
-    # self.session_info[sid] = {
-    #         'is_day': True,
-    #         'night_check': [],
-    #         'votes': {},
-    #         'role' : {mafia_id: 'mafia', cop_id: 'cop', civil_1: 'civil', civil_2: 'civil'},
-    #         'actions': {mafia_id: ['end_day'], cop_id: ['end_day'], civil_1: ['end_day'], civil_2: ['end_day']}
-    #     }
 
     def GetSessionPids(self, sid: int) -> list:
         return list(self.session_info[sid]['role'].keys())
@@ -81,9 +86,6 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
 
     def SetPidActions(self, sid: int, pid: int, new_actions: list):
         self.session_info[sid]['actions'][pid] = new_actions.copy()
-
-    # def AddPidActions(self, sid: int, pid: int, add_actions: list):
-    #     self.session_info[sid]['actions'][pid].append(add_actions.copy())
 
     def RemovePidActionsByPattern(self, sid: int, pid: int, start_with: str):
         self.session_info[sid]['actions'][pid] = list(
@@ -242,6 +244,7 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
 
         for pid in pids:
             self.all_players[pid].session_id = sid
+            self.pid_stats[pid]['session_count'] += 1
 
         self.NotifySession(sid, f'New session with id {sid} starts')
         for pid in pids:
@@ -269,8 +272,12 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
 
         if len(mafia_pids) > 0:
             self.NotifySession(sid, 'Mafia wins')
+            for pid in mafia_pids:
+                self.pid_stats[pid]['win_count'] += 1
         else:
             self.NotifySession(sid, 'Civil wins')
+            for pid in other_pids:
+                self.pid_stats[pid]['win_count'] += 1
 
         self.EndSession(sid)
         return True
@@ -370,6 +377,20 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
         return pid in self.all_players.keys()
 
     ################################## gRPC Functions ##################################
+    # python3 -m grpc_tools.protoc -I=. --python_out=. --pyi_out=. --grpc_python_out=. ./grpc_tools.proto
+
+    def GetPlayerStats(self, request, context):
+        client_pid = request.player_id
+
+        with self.lock:
+            if not self.IsPidValid(client_pid):
+                return grpc_tools_pb2.PlayerStats(is_pid_valid=False, win_count=0, lose_count=0, time_in_game=0, session_count=0)
+
+            stats = self.pid_stats[client_pid].copy()
+
+        return grpc_tools_pb2.PlayerStats(is_pid_valid=True, win_count=stats['win_count'], session_count=stats['session_count'],
+                                          lose_count=stats['session_count'] - stats['win_count'],
+                                          time_in_game=int((datetime.now() - stats['arrival_time']).total_seconds()))
 
     def GetNonSessionPids(self, request, context):
         with self.lock:
@@ -453,6 +474,12 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
             self.all_players[pid] = player
             self.notify[pid] = []
             self.last_hb_time[pid] = datetime.now()
+            self.pid_stats[pid] = {
+                'session_count': 0,
+                'win_count': 0,
+                'lose_count': 0,
+                'arrival_time': datetime.now()
+            }
 
             skip_pid = [pid for pid, info in self.all_players.items() if info.session_id != -1]
             self.NotifyAllExcept(skip_pid, f'Player with id {pid} ({request.player_name}) came to server')

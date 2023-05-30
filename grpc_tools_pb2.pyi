@@ -81,6 +81,20 @@ class PlayerName(_message.Message):
     player_name: str
     def __init__(self, player_name: _Optional[str] = ...) -> None: ...
 
+class PlayerStats(_message.Message):
+    __slots__ = ["is_pid_valid", "lose_count", "session_count", "time_in_game", "win_count"]
+    IS_PID_VALID_FIELD_NUMBER: _ClassVar[int]
+    LOSE_COUNT_FIELD_NUMBER: _ClassVar[int]
+    SESSION_COUNT_FIELD_NUMBER: _ClassVar[int]
+    TIME_IN_GAME_FIELD_NUMBER: _ClassVar[int]
+    WIN_COUNT_FIELD_NUMBER: _ClassVar[int]
+    is_pid_valid: bool
+    lose_count: int
+    session_count: int
+    time_in_game: int
+    win_count: int
+    def __init__(self, session_count: _Optional[int] = ..., win_count: _Optional[int] = ..., lose_count: _Optional[int] = ..., time_in_game: _Optional[int] = ..., is_pid_valid: bool = ...) -> None: ...
+
 class SessionInfo(_message.Message):
     __slots__ = ["is_day", "players", "session_id"]
     IS_DAY_FIELD_NUMBER: _ClassVar[int]
