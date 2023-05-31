@@ -1,0 +1,20 @@
+FROM python:3.9
+
+RUN pip install grpcio==1.54.0
+RUN pip install grpcio-tools==1.54.0
+RUN pip install Flask==2.2.3
+RUN pip install Flask-GraphQL==2.0.1
+RUN pip install graphene==3.2.2
+RUN pip install graphql-core==3.2.1
+
+ARG ADDR=0.0.0.0:50051
+ENV SERVER_ADDR=$ADDR
+
+ARG GQL_PORT=50021
+ENV GRAPHQL_PORT=$GQL_PORT
+
+COPY . /app/
+
+WORKDIR /app/
+
+CMD ["python3", "/app/graphql_server.py"]

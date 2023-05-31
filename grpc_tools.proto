@@ -10,11 +10,18 @@ service MafiaGame {
     rpc GetPlayerStats(PlayerId) returns (PlayerStats) {}
     rpc GetValidActions(PlayerId) returns (Actions) {}
     rpc GetSessionInfo(PlayerId) returns (SessionInfo) {}
+    rpc GetCurrentSessions(Empty) returns (SidList) {}
+    rpc GetPastSessions(Empty) returns (SidList) {}
+    rpc GetScoreboard(SessionId) returns (Scoreboard) {}
     rpc GetLightSessionInfo(PlayerId) returns (LightSessionInfo) {}
     rpc GetNonSessionPids(Empty) returns (PidList) {}
 }
 
 message Empty {
+}
+
+message SessionId {
+    int32 session_id = 1;
 }
 
 message PlayerId {
@@ -27,6 +34,17 @@ message PidList {
 
 message PlayerName {
     string player_name = 1;
+}
+
+message SidList {
+    repeated int32 sids = 1;
+}
+
+message Scoreboard {
+    bool is_session_valid = 1;
+    bool is_session_ended = 2;
+    bool is_day = 3;
+    repeated SessionPlayer players = 4;
 }
 
 message PlayerStats {

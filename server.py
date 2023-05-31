@@ -14,11 +14,12 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
     def __init__(self) -> None:
         print('In server constructor')
         self.id_counter = 0  # to create unique id
-        self.last_hb_time = {}  # pid -> datetime
-        self.notify = {}        # pid -> message queue
-        self.all_players = {}   # pid -> pb_Player
+        self.last_hb_time = {}   # pid -> datetime
+        self.notify = {}         # pid -> message queue
+        self.all_players = {}    # pid -> pb_Player
 
-        self.session_info = {}  # sid -> info
+        self.past_sessions = {}  # sid -> info
+        self.session_info = {}   # sid -> info
         # Session state example
         # self.session_info[sid] = {
         #         'is_day': True,
@@ -28,7 +29,7 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
         #         'actions': {mafia_id: ['end_day'], cop_id: ['end_day'], civil_1: ['end_day'], civil_2: ['end_day']}
         #     }
 
-        self.pid_stats = {}     # pid -> player stats
+        self.pid_stats = {}      # pid -> player stats
         # Player state example:
         # self.pid_stats[pid] = {
         #     'session_count': 0,
@@ -258,7 +259,9 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
             self.all_players[pid].session_id = -1
             self.NotifyPlayer(pid, 'Current session ends')
 
+        self.past_sessions[sid] = self.session_info[sid].copy()
         self.session_info.pop(sid)
+
         print(f'End session {sid}')
 
     def TryEndSession(self, sid: int) -> bool:
@@ -378,6 +381,43 @@ class MafiaGameServicer(grpc_tools_pb2_grpc.MafiaGameServicer):
 
     ################################## gRPC Functions ##################################
     # python3 -m grpc_tools.protoc -I=. --python_out=. --pyi_out=. --grpc_python_out=. ./grpc_tools.proto
+
+    def GetScoreboard(self, request, context):
+        sid = request.session_id
+
+        with self.lock:
+            if (sid not in self.session_info.keys()) and (sid not in self.past_sessions.keys()):
+                return grpc_tools_pb2.Scoreboard(is_session_valid=False, is_day=True, is_session_ended=False, players=[])
+
+            if sid in self.session_info.keys():
+                is_ended = False
+                info = self.session_info[sid].copy()
+            else:
+                is_ended = True
+                info = self.past_sessions[sid].copy()
+
+            players = []
+            for pid, role in info['role'].items():
+                name = self.all_players[pid].player_name
+
+                if not is_ended and role != 'ghost':
+                    role = '?'
+
+                players.append(grpc_tools_pb2.SessionPlayer(player_id=pid, player_name=name, player_role=role))
+
+        return grpc_tools_pb2.Scoreboard(is_session_valid=True, is_day=info['is_day'], is_session_ended=is_ended, players=players)
+
+    def GetCurrentSessions(self, request, context):
+        with self.lock:
+            sids = list(self.session_info.keys())
+
+        return grpc_tools_pb2.SidList(sids=sids)
+
+    def GetPastSessions(self, request, context):
+        with self.lock:
+            sids = list(self.past_sessions.keys())
+
+        return grpc_tools_pb2.SidList(sids=sids)
 
     def GetPlayerStats(self, request, context):
         client_pid = request.player_id

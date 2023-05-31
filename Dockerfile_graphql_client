@@ -1,0 +1,12 @@
+FROM python:3.9
+
+RUN pip install requests==2.28.2
+
+ARG GQL_ADDR=0.0.0.0:50021
+ENV GRAPHQL_ADDR=$GQL_ADDR
+
+COPY . /app/
+
+WORKDIR /app/
+
+CMD ["python3", "/app/graphql_client.py"]

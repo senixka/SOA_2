@@ -7,7 +7,6 @@ RUN pip install Flask==2.2.3
 RUN pip install Flask-RESTful==0.3.10
 RUN pip install PyJWT==2.3.0
 
-
 ARG ADDR=0.0.0.0:50051
 ENV SERVER_ADDR=$ADDR
 

@@ -39,6 +39,27 @@ services:
     stdin_open: true
     tty: true
 
+  graphql_server:
+    build:
+      dockerfile: ./Dockerfile_graphql_server
+      context: .
+      args:
+        ADDR: ${SERVER_ADDR}
+        GQL_PORT: ${GRAPHQL_PORT}
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+
+  graphql_client:
+    build:
+      dockerfile: ./Dockerfile_graphql_client
+      context: .
+      args:
+        GQL_ADDR: ${GRAPHQL_ADDR}
+    network_mode: "host"
+    stdin_open: true
+    tty: true
+
   client:
     build:
       dockerfile: ./Dockerfile_client

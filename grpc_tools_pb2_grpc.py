@@ -49,6 +49,21 @@ class MafiaGameStub(object):
                 request_serializer=grpc__tools__pb2.PlayerId.SerializeToString,
                 response_deserializer=grpc__tools__pb2.SessionInfo.FromString,
                 )
+        self.GetCurrentSessions = channel.unary_unary(
+                '/mafia_game.MafiaGame/GetCurrentSessions',
+                request_serializer=grpc__tools__pb2.Empty.SerializeToString,
+                response_deserializer=grpc__tools__pb2.SidList.FromString,
+                )
+        self.GetPastSessions = channel.unary_unary(
+                '/mafia_game.MafiaGame/GetPastSessions',
+                request_serializer=grpc__tools__pb2.Empty.SerializeToString,
+                response_deserializer=grpc__tools__pb2.SidList.FromString,
+                )
+        self.GetScoreboard = channel.unary_unary(
+                '/mafia_game.MafiaGame/GetScoreboard',
+                request_serializer=grpc__tools__pb2.SessionId.SerializeToString,
+                response_deserializer=grpc__tools__pb2.Scoreboard.FromString,
+                )
         self.GetLightSessionInfo = channel.unary_unary(
                 '/mafia_game.MafiaGame/GetLightSessionInfo',
                 request_serializer=grpc__tools__pb2.PlayerId.SerializeToString,
@@ -106,6 +121,24 @@ class MafiaGameServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetCurrentSessions(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetPastSessions(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetScoreboard(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetLightSessionInfo(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -155,6 +188,21 @@ def add_MafiaGameServicer_to_server(servicer, server):
                     servicer.GetSessionInfo,
                     request_deserializer=grpc__tools__pb2.PlayerId.FromString,
                     response_serializer=grpc__tools__pb2.SessionInfo.SerializeToString,
+            ),
+            'GetCurrentSessions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCurrentSessions,
+                    request_deserializer=grpc__tools__pb2.Empty.FromString,
+                    response_serializer=grpc__tools__pb2.SidList.SerializeToString,
+            ),
+            'GetPastSessions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPastSessions,
+                    request_deserializer=grpc__tools__pb2.Empty.FromString,
+                    response_serializer=grpc__tools__pb2.SidList.SerializeToString,
+            ),
+            'GetScoreboard': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetScoreboard,
+                    request_deserializer=grpc__tools__pb2.SessionId.FromString,
+                    response_serializer=grpc__tools__pb2.Scoreboard.SerializeToString,
             ),
             'GetLightSessionInfo': grpc.unary_unary_rpc_method_handler(
                     servicer.GetLightSessionInfo,
@@ -292,6 +340,57 @@ class MafiaGame(object):
         return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetSessionInfo',
             grpc__tools__pb2.PlayerId.SerializeToString,
             grpc__tools__pb2.SessionInfo.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetCurrentSessions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetCurrentSessions',
+            grpc__tools__pb2.Empty.SerializeToString,
+            grpc__tools__pb2.SidList.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetPastSessions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetPastSessions',
+            grpc__tools__pb2.Empty.SerializeToString,
+            grpc__tools__pb2.SidList.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetScoreboard(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/mafia_game.MafiaGame/GetScoreboard',
+            grpc__tools__pb2.SessionId.SerializeToString,
+            grpc__tools__pb2.Scoreboard.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

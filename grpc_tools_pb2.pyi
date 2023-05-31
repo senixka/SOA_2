@@ -95,6 +95,24 @@ class PlayerStats(_message.Message):
     win_count: int
     def __init__(self, session_count: _Optional[int] = ..., win_count: _Optional[int] = ..., lose_count: _Optional[int] = ..., time_in_game: _Optional[int] = ..., is_pid_valid: bool = ...) -> None: ...
 
+class Scoreboard(_message.Message):
+    __slots__ = ["is_day", "is_session_ended", "is_session_valid", "players"]
+    IS_DAY_FIELD_NUMBER: _ClassVar[int]
+    IS_SESSION_ENDED_FIELD_NUMBER: _ClassVar[int]
+    IS_SESSION_VALID_FIELD_NUMBER: _ClassVar[int]
+    PLAYERS_FIELD_NUMBER: _ClassVar[int]
+    is_day: bool
+    is_session_ended: bool
+    is_session_valid: bool
+    players: _containers.RepeatedCompositeFieldContainer[SessionPlayer]
+    def __init__(self, is_session_valid: bool = ..., is_session_ended: bool = ..., is_day: bool = ..., players: _Optional[_Iterable[_Union[SessionPlayer, _Mapping]]] = ...) -> None: ...
+
+class SessionId(_message.Message):
+    __slots__ = ["session_id"]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    session_id: int
+    def __init__(self, session_id: _Optional[int] = ...) -> None: ...
+
 class SessionInfo(_message.Message):
     __slots__ = ["is_day", "players", "session_id"]
     IS_DAY_FIELD_NUMBER: _ClassVar[int]
@@ -114,3 +132,9 @@ class SessionPlayer(_message.Message):
     player_name: str
     player_role: str
     def __init__(self, player_id: _Optional[int] = ..., player_name: _Optional[str] = ..., player_role: _Optional[str] = ...) -> None: ...
+
+class SidList(_message.Message):
+    __slots__ = ["sids"]
+    SIDS_FIELD_NUMBER: _ClassVar[int]
+    sids: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(self, sids: _Optional[_Iterable[int]] = ...) -> None: ...
