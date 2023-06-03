@@ -291,7 +291,7 @@ if __name__ == '__main__':
                 time.sleep(1)
         print('Connected to gRPC stub')
 
-        app.run()
+        app.run(port=int(os.environ.get('REST_PORT', '50031')), host='0.0.0.0')
     except:
         print('Interrupted')
         try:

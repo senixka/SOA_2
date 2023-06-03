@@ -75,14 +75,14 @@ exit - Выйти из клиента.
 ## REST Сервер
 
 В качестве клиента взаимодействия с `REST` сервером используется `curl`.
-`REST` сервер работает на порту `5000`.
+`REST` сервер работает на порту `50031`.
 Далее показаны примеры запросов и методов `REST` сервера.
 
 #### Зарегистрировать пользователя:
 Для регистрации требуется указать `pid` игрока. `pid` выдается игровым сервером при подключении клиента (строка "`Player successfully registered on server with id <PID>`") и пароль, 
 который будет использоваться данным `pid`:
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"pid": 23, "pwd": "1234"}' http://localhost:5000/register
+curl -X POST -H "Content-Type: application/json" -d '{"pid": 23, "pwd": "1234"}' http://localhost:50031/register
 ```
 
 #### Получить JWT токен:
@@ -90,44 +90,44 @@ curl -X POST -H "Content-Type: application/json" -d '{"pid": 23, "pwd": "1234"}'
 `PUT` и `DELETE` (подставляется вместо `<JWT_TOKEN>`). Для получения токена требуется указать `pid` и пароль:
 
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"pid":23, "pwd": "1234"}' http://localhost:5000/login
+curl -X POST -H "Content-Type: application/json" -d '{"pid":23, "pwd": "1234"}' http://localhost:50031/login
 ```
 
 #### Информация об игроке:
 Получить информацию об игроках (указываются их `pid`):
 ```
-curl -X GET -H "Content-Type: application/json" -d '{"pids":[0, 1, 23]}' http://localhost:5000/player
+curl -X GET -H "Content-Type: application/json" -d '{"pids":[0, 1, 23]}' http://localhost:50031/player
 ```
 
 Обновить информацию игрока (указываются обновляемые поля и их новые значения).
 Поля, доступные для обновления: `name`, `email`, `male`.
 ```
-curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"name":"Ivan", "email":"ivan@mail.com", "gender":"male"}' http://localhost:5000/player    
+curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"name":"Ivan", "email":"ivan@mail.com", "gender":"male"}' http://localhost:50031/player    
 ```
 
 Для обновления аватарки вместо `<PATH_TO_AVATAR>` подставьте путь к файлу аватарки (например локальный файл `my_avatar.jpg`).
 Файл должен быть формата `.jpg`:
 ```
-curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -F avatar=@<PATH_TO_AVATAR> http://localhost:5000/player
+curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -F avatar=@<PATH_TO_AVATAR> http://localhost:50031/player
 ```
 
 Для удаления информации по игроку требуется указать удаляемые поля.
 Доступные поля: `name`, `email`, `gender`, `avatar`.
 ```
-curl -X DELETE -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"values":["name", "email", "gender", "avatar"]}' http://localhost:5000/player
+curl -X DELETE -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"values":["name", "email", "gender", "avatar"]}' http://localhost:50031/player
 ```
 
 #### Получить ссылку на PDF:
 Прежде чем получить сам PDF, нужно асинхронным запросом получить ссылку на файл, 
 где вместо `<PID>` указывается `pid` игрока:
 ```
-curl -X GET http://localhost:5000/stats/<PID>
+curl -X GET http://localhost:50031/stats/<PID>
 ```
 
 #### Получить PDF файл:
 Получить сам PDF (вместо `<PID>` указывается `pid` игрока) и сохранить его в `temp.pdf`:
 ```
-curl -X GET http://localhost:5000/pdf/<PID> >temp.pdf
+curl -X GET http://localhost:50031/pdf/<PID> >temp.pdf
 ```
 
 ## Игровой процесс

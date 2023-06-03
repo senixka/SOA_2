@@ -111,7 +111,7 @@ if __name__ == "__main__":
                 time.sleep(1)
         print('Connected to gRPC stub')
 
-        app.run(port=int(os.environ.get('GRAPHQL_PORT', '50021')))
+        app.run(port=int(os.environ.get('GRAPHQL_PORT', '50021')), host='0.0.0.0')
     except:
         print('Interrupted')
         try:
