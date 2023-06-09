@@ -8,6 +8,7 @@ import datetime
 import grpc_tools_pb2
 import grpc_tools_pb2_grpc
 from functools import wraps
+from threading import Thread, Lock
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from flask_restful import Api, Resource
@@ -33,6 +34,10 @@ pid_counter = 0
 
 # Used to generate PDF
 pdf_stats = {}  # pid -> file
+
+# Pdf task queue
+pdf_task_queue = []
+pdf_task_queue_lock = Lock()
 
 # gRPC to game server
 stub = None
@@ -67,7 +72,7 @@ def token_required(f):
 
 
 class RegistrationResource(Resource):
-    # curl -X POST -H "Content-Type: application/json" -d '{"pid": 23, "pwd": "1234"}' http://localhost:5000/register
+    # curl -X POST -H "Content-Type: application/json" -d '{"pid": 23, "pwd": "1234"}' http://localhost:50031/register
     def post(self):
         data = request.get_json()
 
@@ -106,7 +111,7 @@ class RegistrationResource(Resource):
 
 
 class LoginResource(Resource):
-    # curl -X POST -H "Content-Type: application/json" -d '{"pid":23, "pwd": "1234"}' http://localhost:5000/login
+    # curl -X POST -H "Content-Type: application/json" -d '{"pid":23, "pwd": "1234"}' http://localhost:50031/login
     def post(self):
         data = request.get_json()
 
@@ -134,7 +139,7 @@ class LoginResource(Resource):
 
 
 class PlayerResource(Resource):
-    # curl -X GET -H "Content-Type: application/json" -d '{"pids":[0, 1, 23]}' http://localhost:5000/player
+    # curl -X GET -H "Content-Type: application/json" -d '{"pids":[0, 1, 23]}' http://localhost:50031/player
     def get(self):
         data = request.get_json()
 
@@ -157,8 +162,8 @@ class PlayerResource(Resource):
 
         return jsonify(response)
 
-    # curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -F avatar=@avatar_file.jpg http://localhost:5000/player
-    # curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"name":"Ivan", "email":"ivan@mail.com", "gender":"male"}' http://localhost:5000/player
+    # curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -F avatar=@avatar_file.jpg http://localhost:50031/player
+    # curl -X PUT -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"name":"Ivan", "email":"ivan@mail.com", "gender":"male"}' http://localhost:50031/player
     @token_required
     def put(self, current_player):
         try:
@@ -181,7 +186,7 @@ class PlayerResource(Resource):
 
         return jsonify(players[current_player['pid']])
 
-    # curl -X DELETE -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"values":["name", "email", "gender", "avatar"]}' http://localhost:5000/player
+    # curl -X DELETE -H "Authorization: Bearer <JWT_TOKEN>" -H "Content-Type: application/json" -d '{"values":["name", "email", "gender", "avatar"]}' http://localhost:50031/player
     @token_required
     def delete(self, current_player):
         data = request.get_json()
@@ -199,36 +204,57 @@ class PlayerResource(Resource):
 
 
 class StatisticsResource(Resource):
-    # curl -X GET http://localhost:5000/stats/<int:pid>
+    # curl -X GET http://localhost:50031/stats/<int:pid>
     def get(self, pid):
         if pid not in players.keys():
             return make_response(jsonify({'error': 'You must first register this pid via /register'}), 404)
 
-        pdf_stats[pid] = f'statistics_{pid}.pdf'
+        with pdf_task_queue_lock:
+            pdf_task_queue.append(pid)
+
         return jsonify({'url': f'/pdf/{pid}'})
 
 
 class PDFResource(Resource):
-    # curl -X GET http://localhost:5000/pdf/<int:pid> >temp.pdf
+    # curl -X GET http://localhost:50031/pdf/<int:pid> >temp.pdf
     def get(self, pid):
-        if pid not in pdf_stats.keys():
-            return make_response(jsonify({'error': 'You must first request this link via /stats/<int:pid>'}), 404)
+        with pdf_task_queue_lock:
+            if (pid not in pdf_stats.keys()) and (pid not in pdf_task_queue):
+                return make_response(jsonify({'error': 'You must first request this link via /stats/<int:pid>'}), 404)
 
-        if pid not in players.keys():
-            return make_response(jsonify({'error': 'You must first register this pid via /register'}), 404)
+            if pid not in pdf_stats.keys():
+                return make_response(jsonify({'error': 'Pdf not ready'}), 404)
 
-        try:
-            response = stub.GetPlayerStats(grpc_tools_pb2.PlayerId(player_id=pid))
-        except:
-            return make_response(jsonify({'error': 'Can not connect to game server via gRPC'}), 404)
+            pdf_filename = pdf_stats[pid]
 
-        if not response.is_pid_valid:
-            return make_response(jsonify({'error': 'This pid not valid on game server'}), 404)
+            if pdf_filename[:len('statistics_')] != 'statistics_':
+                return make_response(jsonify({'error': pdf_filename}), 404)
 
-        pdf_filename = pdf_stats[pid]
-        generate_statistics_pdf(players[pid], response, pdf_filename)
+            return send_file(pdf_filename, download_name=pdf_filename)
 
-        return send_file(pdf_filename, download_name=pdf_filename)
+
+def thread_worker() -> None:
+    while True:
+        time.sleep(1)
+
+        with pdf_task_queue_lock:
+            while len(pdf_task_queue) > 0:
+                pid = pdf_task_queue[0]
+                pdf_task_queue.pop(0)
+
+                try:
+                    response = stub.GetPlayerStats(grpc_tools_pb2.PlayerId(player_id=pid))
+                except:
+                    pdf_stats[pid] = 'Can not connect to game server via gRPC'
+                    continue
+
+                if not response.is_pid_valid:
+                    pdf_stats[pid] = 'This pid not valid on game server'
+                    continue
+
+                pdf_filename = f'statistics_{pid}.pdf'
+                generate_statistics_pdf(players[pid], response, pdf_filename)
+                pdf_stats[pid] = pdf_filename
 
 
 def generate_statistics_pdf(player, game_stats, filename):
@@ -250,7 +276,6 @@ def generate_statistics_pdf(player, game_stats, filename):
     avatar_file = 'default.jpg'
     if os.path.isfile(player['avatar']):
         avatar_file = player['avatar']
-
     try:
         pdf.drawImage(avatar_file, 430, 600, 150, 150)
     except:
@@ -290,6 +315,8 @@ if __name__ == '__main__':
                 print('Cannot connect to game server')
                 time.sleep(1)
         print('Connected to gRPC stub')
+
+        Thread(target=thread_worker).start()
 
         app.run(port=int(os.environ.get('REST_PORT', '50031')), host='0.0.0.0')
     except:
